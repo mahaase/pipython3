@@ -1,6 +1,6 @@
 inherit: ["pipython3::vars"]
 
-buildTools: [pipython3]
+buildTools: [python3]
 buildScript: |
     pipInstall()
     {

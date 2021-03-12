@@ -20,7 +20,7 @@ checkoutScript: |
     patchApplySeries $<<pipython3/*>>
 
 # depends on python3-minimal tool
-buildTools: [pipython3]
+buildTools: [python3]
 buildScript: |
     mkdir -p src
     rsync -aH --delete --exclude "*.tar.xz*" $1/ src/
@@ -46,7 +46,7 @@ multiPackage:
             installPackageTgt "$1/install/"
 
         provideTools:
-            pipython3: usr/bin
+            python3: usr/bin
 
     dev:
         depends:
@@ -61,6 +61,6 @@ multiPackage:
             rsync -a "$1/install/" .
 
         provideTools:
-            pipython3:
+            python3:
                 path: usr/bin
                 netAccess: True

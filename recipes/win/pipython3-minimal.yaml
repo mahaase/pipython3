@@ -25,4 +25,4 @@ packageScript: |
     cp -a $1/install/* .
 
 provideTools:
-    pipython3: "."
+    python3: "."

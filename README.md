@@ -35,4 +35,4 @@ available.
 
 The following tools can be used by naming them in `{checkout,build,package}Tools`:
 
-* pipython3
+* python3

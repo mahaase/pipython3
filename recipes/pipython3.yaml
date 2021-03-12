@@ -46,7 +46,7 @@ multiPackage:
               - libs::readline-tgt
               - libs::zlib-tgt
 
-        buildTools: [pipython3]
+        buildTools: [python3]
         buildScript: |
             buildMe()
             {
@@ -83,7 +83,7 @@ multiPackage:
                     autotoolsPackageTgt
 
                 provideTools:
-                    pipython3: usr/bin
+                    python3: usr/bin
 
             dev:
                 depends:
@@ -99,7 +99,7 @@ multiPackage:
                     rsync -a "$1/install/" .
 
                 provideTools:
-                    pipython3:
+                    python3:
                         path: usr/bin
                         netAccess: True
 
@@ -137,5 +137,5 @@ multiPackage:
             autotoolsPackageTgt
 
         provideTools:
-            pipython3: usr/bin
+            python3: usr/bin
 
