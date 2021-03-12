@@ -1,0 +1,141 @@
+inherit: [autotools, autoconf, make, patch]
+
+metaEnvironment:
+    PKG_VERSION: "3.8.0"
+
+privateEnvironment:
+    APPLY_LIBTOOL_PATCH: "no"
+
+checkoutSCM:
+    scm: url
+    url: ${PYTHON_MIRROR}/${PKG_VERSION}/Python-${PKG_VERSION}.tar.xz
+    digestSHA256: "b356244e13fb5491da890b35b13b2118c3122977c2cd825e3eb6e7d462030d84"
+    stripComponents: 1
+
+checkoutDeterministic: True
+checkoutScript: |
+    patchApplySeries $<<pipython3/*>>
+    autoconfReconfigure
+
+# We cannot use out-of-tree builds directly from the source workspace because
+# the build somehow manages to create .pyc files in the sources. Setting
+# PYTHONDONTWRITEBYTECODE does not suffice.
+buildScript: |
+    mkdir -p src
+    rsync -aH --delete $1/ src/
+
+multiPackage:
+    "":
+        depends:
+           - libs::expat-dev
+           - libs::gdbm-dev
+           - libs::libffi-dev
+           - libs::ncurses-dev
+           - libs::openssl-dev
+           - libs::readline-dev
+           - libs::zlib-dev
+           - pipython3-setuptools
+
+           - use: []
+             depends:
+              - libs::expat-tgt
+              - libs::gdbm-tgt
+              - libs::libffi-tgt
+              - libs::ncurses-tgt
+              - libs::openssl-tgt
+              - libs::readline-tgt
+              - libs::zlib-tgt
+
+        buildTools: [pipython3]
+        buildScript: |
+            buildMe()
+            {
+                export ac_cv_file__dev_ptc=yes
+                export ac_cv_file__dev_ptmx=yes
+                export ac_cv_have_long_long_format=yes
+                export ac_cv_prog_HAS_HG=/bin/false
+                export ac_cv_working_tzset=yes
+
+                autotoolsBuild $PWD/src \
+                    --without-ensurepip \
+                    --without-cxx-main \
+                    --disable-pydoc \
+                    --disable-sqlite3 \
+                    --disable-test-modules \
+                    --disable-lib2to3 \
+                    --disable-tk \
+                    --disable-nis \
+                    --disable-idle3 \
+                    --disable-bzip2 \
+                    --disable-xz \
+                    --disable-pyc-build \
+                    --disable-uuid
+
+                rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
+            }
+
+        multiPackage:
+            "":
+                buildScript: |
+                    buildMe
+
+                packageScript: |
+                    autotoolsPackageTgt
+
+                provideTools:
+                    pipython3: usr/bin
+
+            dev:
+                depends:
+                   - pipython3-pip
+                   - pipython3-wheel
+
+                buildScript: |
+                    buildMe
+                    rsync -a "${BOB_DEP_PATHS[pipython3-pip]}/" install/
+                    rsync -a "${BOB_DEP_PATHS[pipython3-wheel]}/" install/
+
+                packageScript: |
+                    rsync -a "$1/install/" .
+
+                provideTools:
+                    pipython3:
+                        path: usr/bin
+                        netAccess: True
+
+        provideDeps: [ "*-tgt" ]
+
+    minimal:
+        depends:
+           - libs::expat-dev
+           - libs::gdbm-dev
+           - libs::libffi-dev
+           - libs::openssl-dev
+           - libs::zlib-dev
+
+        buildScript: |
+            autotoolsBuild $PWD/src \
+                --without-ensurepip \
+                --without-cxx-main \
+                --disable-sqlite3 \
+                --disable-tk \
+                --disable-curses \
+                --disable-codecs-cjk \
+                --disable-nis \
+                --enable-unicodedata \
+                --disable-test-modules \
+                --disable-idle3 \
+                --disable-ossaudiodev \
+                --disable-pyc-build \
+                --disable-zlib \
+                --disable-bzip2 \
+                --disable-readline \
+                --disable-xz \
+                --disable-uuid
+
+        packageScript: |
+            autotoolsPackageTgt
+
+        provideTools:
+            pipython3: usr/bin
+

@@ -1,0 +1,7 @@
+inherit: [pipython3]
+
+buildScript: |
+    pipInstall "pybind11[global]==2.6.2"
+
+packageScript: |
+    installPythonModule

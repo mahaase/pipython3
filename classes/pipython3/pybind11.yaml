@@ -1,0 +1,32 @@
+inherit: [buildenv, pipython3]
+
+depends:
+    - if: "$(eq,${BOB_HOST_PLATFORM},linux)"
+      name: pipython3-dev
+    - if: "$(eq,${BOB_HOST_PLATFORM},msys)"
+      name: win::pipython3-dev
+    - pipython3-pybind11
+
+buildVars: [BOB_HOST_PLATFORM]
+buildScript: |
+    buildenvBuildPyBind11()
+    {
+        if [[ "${BOB_HOST_PLATFORM}" == "linux" ]] ; then
+            buildenvBuildAll -DCMAKE_INSTALL_LIBDIR="${PYTHONDESTLIB}"
+        else
+            buildenvBuildAll
+        fi
+    }
+
+packageScript: |
+    PACKAGE_DIR="$1"
+
+    buildenvPackagePyBind11Dev()
+    {
+        buildenvPackageDev "${PACKAGE_DIR}" "${PYTHONDESTLIB}/" "${PYTHONDESTLIB}/***" "*.pyd" "$@"
+    }
+
+    buildenvPackagePyBind11Tgt()
+    {
+        buildenvPackageTgt "${PACKAGE_DIR}" "$@"
+    }
