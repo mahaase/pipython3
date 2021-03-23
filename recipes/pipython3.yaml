@@ -72,6 +72,7 @@ multiPackage:
                     --disable-uuid
 
                 rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
+                ln -sf install/usr/bin/python3 install/usr/bin/python
             }
 
         multiPackage:
@@ -132,6 +133,8 @@ multiPackage:
                 --disable-readline \
                 --disable-xz \
                 --disable-uuid
+
+            ln -sf install/usr/bin/python3 install/usr/bin/python
 
         packageScript: |
             autotoolsPackageTgt
