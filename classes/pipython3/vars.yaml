@@ -11,7 +11,7 @@ buildScript: &ref |
     for i in "${!BOB_ALL_PATHS[@]}" ; do
         if [[ $i != *-tgt ]] ; then
             PREFIX="${BOB_ALL_PATHS[$i]}$PYTHONDESTLIB"
-            for j in "" "lib-dynload" "site-packages" ; do
+            for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
                 PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$PREFIX${j:+/$j}"
             done
         fi
