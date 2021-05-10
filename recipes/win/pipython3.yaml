@@ -38,7 +38,7 @@ buildScript: |
     cp -a install/usr/bin/*.lib install/usr/libs/
     cp src/python3-config install/usr/bin
 
-    rsync -a "${BOB_DEP_PATHS[pipython3::pipython3-setuptools]}/" install/
+    rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
 
 multiPackage:
     "":
