@@ -25,7 +25,7 @@ buildScript: |
     mkdir -p src
     rsync -aH --delete --exclude "*.tar.xz*" $1/ src/
 
-    EXTERNALS_DIR="$(pwd -W)/externals" PYTHON="$(which python3)" ./src/PCbuild/build.bat -p x64
+    EXTERNALS_DIR="$(pwd -W)/externals" HOST_PYTHON="$(which python3)" ./src/PCbuild/build.bat -p x64
     installdir="$(find src/PCbuild -iname 'python.exe')"
     installdir="$(dirname $installdir)"
 
