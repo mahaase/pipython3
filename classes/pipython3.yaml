@@ -1,6 +1,7 @@
 inherit: ["pipython3::vars"]
 
 buildTools: [python3]
+buildVars: [PYTHONPATH, PYTHONDESTLIB]
 buildScript: |
     pipInstall()
     {
@@ -12,6 +13,11 @@ buildScript: |
             --disable-pip-version-check \
             --no-warn-script-location \
             --ignore-installed
+
+        for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
+            PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$PWD/install$PYTHONDESTLIB${j:+/$j}"
+        done
+        export PYTHONPATH
     }
 
 packageScript: |

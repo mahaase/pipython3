@@ -72,7 +72,9 @@ multiPackage:
                     --disable-uuid
 
                 rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
-                ln -sf install/usr/bin/python3 install/usr/bin/python
+                pushd install/usr/bin
+                ln -sf python3 python
+                popd
             }
 
         multiPackage:
