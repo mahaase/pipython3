@@ -5,17 +5,23 @@ buildVars: [PYTHONPATH, PYTHONDESTLIB]
 buildScript: |
     pipInstall()
     {
+        ROOT_DIR=${PWD}/install
+        if [[ "${1-}" == "--no-install" ]] ; then
+            ROOT_DIR=${PWD}/build
+            shift
+        fi
+
         # force lib instead of Lib for MSYS
-        mkdir -p install/usr/lib
+        mkdir -p ${ROOT_DIR}/usr/lib
         python3 -m pip install -q $* \
-            --root ${PWD}/install \
+            --root ${ROOT_DIR} \
             --prefix usr \
             --disable-pip-version-check \
             --no-warn-script-location \
             --ignore-installed
 
         for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
-            PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$PWD/install$PYTHONDESTLIB${j:+/$j}"
+            PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}${ROOT_DIR}$PYTHONDESTLIB${j:+/$j}"
         done
         export PYTHONPATH
     }
