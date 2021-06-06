@@ -7,7 +7,7 @@ buildScript: |
     {
         ROOT_DIR=${PWD}/install
         if [[ "${1-}" == "--no-install" ]] ; then
-            ROOT_DIR=${PWD}/build
+            ROOT_DIR=${PWD}/pym
             shift
         fi
 
