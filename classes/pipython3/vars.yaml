@@ -8,16 +8,20 @@ buildScript: &ref |
     export PYTHONDESTLIB
     export PYTHONVERSION=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('py_version_short'))")
 
+    PYTHONPATH=
     for i in "${!BOB_ALL_PATHS[@]}" ; do
         if [[ $i != *-tgt ]] ; then
             PREFIX="${BOB_ALL_PATHS[$i]}$PYTHONDESTLIB"
             for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
-                PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$PREFIX${j:+/$j}"
+                PYTHONPATH+="${PYTHONPATH:+:}$PREFIX${j:+/$j}"
             done
         fi
     done
     export PYTHONPATH
     export PYTHONBYTECODEPATH="${PYTHONBYTECODEPATH:-${TMP:-/tmp}}"
+
+    PYTHONLIB="$(python3-config --configdir)/$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LDLIBRARY"))')"
+    PYTHONINC="$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')"
 
 packageTools: [python3]
 packageScript: *ref

@@ -1,29 +1,33 @@
 inherit: ["pipython3::vars"]
 
+environment:
+    PYTHON_NO_INSTALL: "no"
+
 buildTools: [python3]
-buildVars: [PYTHONPATH, PYTHONDESTLIB]
+buildVars: [PYTHONPATH, PYTHONDESTLIB, PYTHON_NO_INSTALL]
 buildScript: |
+    PYTHONROOTDIR=${PWD}/install
+    if [[ "${PYTHON_NO_INSTALL}" != "no" ]] ; then
+        PYTHONROOTDIR=${PWD}/pym
+        shift
+    fi
+    PYTHONPATH="${PYTHONPATH:+$PYTHONPATH}"
+    for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
+        PYTHONPATH+="${PYTHONPATH:+:}${PYTHONROOTDIR}$PYTHONDESTLIB${j:+/$j}"
+    done
+    export PYTHONPATH
+    export PYTHONROOTDIR
+
     pipInstall()
     {
-        ROOT_DIR=${PWD}/install
-        if [[ "${1-}" == "--no-install" ]] ; then
-            ROOT_DIR=${PWD}/pym
-            shift
-        fi
-
         # force lib instead of Lib for MSYS
-        mkdir -p ${ROOT_DIR}/usr/lib
+        mkdir -p ${PYTHONROOTDIR}/usr/lib
         python3 -m pip install -q $* \
-            --root ${ROOT_DIR} \
+            --root ${PYTHONROOTDIR} \
             --prefix usr \
             --disable-pip-version-check \
             --no-warn-script-location \
             --ignore-installed
-
-        for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
-            PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}${ROOT_DIR}$PYTHONDESTLIB${j:+/$j}"
-        done
-        export PYTHONPATH
     }
 
 packageScript: |
