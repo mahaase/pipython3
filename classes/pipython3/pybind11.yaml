@@ -1,4 +1,4 @@
-inherit: [buildenv, pipython3]
+inherit: [cmake, pipython3]
 
 depends:
     - if: "$(eq,${BOB_HOST_PLATFORM},linux)"
@@ -7,26 +7,19 @@ depends:
       name: win::pipython3-dev
     - pipython3-pybind11
 
-buildVars: [BOB_HOST_PLATFORM]
 buildScript: |
-    buildenvBuildPyBind11()
+    cmakeBuildPyBind11()
     {
-        if [[ "${BOB_HOST_PLATFORM}" == "linux" ]] ; then
-            buildenvBuildAll -DCMAKE_INSTALL_LIBDIR="${PYTHONDESTLIB}"
-        else
-            buildenvBuildAll
-        fi
+        cmakeBuild -DCMAKE_INSTALL_LIBDIR="${PYTHONDESTLIB}" "$@"
     }
 
 packageScript: |
-    PACKAGE_DIR="$1"
-
-    buildenvPackagePyBind11Dev()
+    cmakePackagePyBind11Dev()
     {
-        buildenvPackageDev "${PACKAGE_DIR}" "${PYTHONDESTLIB}/" "${PYTHONDESTLIB}/***" "*.pyd" "$@"
+        cmakePackageDev ${_CMAKE_BUILD_PATH} "${PYTHONDESTLIB}/" "${PYTHONDESTLIB}/***" "*.pyd" "$@"
     }
 
-    buildenvPackagePyBind11Tgt()
+    cmakePackagePyBind11Tgt()
     {
-        buildenvPackageTgt "${PACKAGE_DIR}" "$@"
+        cmakePackageTgt ${_CMAKE_BUILD_PATH} "$@"
     }
