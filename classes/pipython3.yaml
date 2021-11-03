@@ -5,7 +5,7 @@ environment:
 
 buildTools: [python3]
 buildVars: [PYTHONPATH, PYTHONDESTLIB, PYTHON_NO_INSTALL]
-buildScript: |
+buildSetup: |
     PYTHONROOTDIR=${PWD}/install
     if [[ "${PYTHON_NO_INSTALL}" != "no" ]] ; then
         PYTHONROOTDIR=${PWD}/pym
@@ -30,7 +30,7 @@ buildScript: |
             --ignore-installed
     }
 
-packageScript: |
+packageSetup: |
     BUILD_DIR=$1
 
     installPythonModule()

@@ -7,13 +7,13 @@ depends:
       name: win::pipython3-dev
     - pipython3-pybind11
 
-buildScript: |
+buildSetup: |
     cmakeBuildPyBind11()
     {
         cmakeBuild -DCMAKE_INSTALL_LIBDIR="${PYTHONDESTLIB}" "$@"
     }
 
-packageScript: |
+packageSetup: |
     cmakePackagePyBind11Dev()
     {
         cmakePackageDev ${_CMAKE_BUILD_PATH} "${PYTHONDESTLIB}/" "${PYTHONDESTLIB}/***" "*.pyd" "$@"
