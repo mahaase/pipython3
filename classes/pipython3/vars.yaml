@@ -6,7 +6,6 @@ buildSetup: &ref |
         PYTHONDESTLIB="/usr/lib"
     fi
     export PYTHONDESTLIB
-    export PYTHONVERSION=$(python3 -c "import sysconfig; print(sysconfig.get_config_var('py_version_short'))")
 
     PYTHONPATH=
     for i in "${!BOB_ALL_PATHS[@]}" ; do
@@ -20,8 +19,22 @@ buildSetup: &ref |
     export PYTHONPATH
     export PYTHONBYTECODEPATH="${PYTHONBYTECODEPATH:-${TMP:-/tmp}}"
 
-    PYTHONLIB="$(python3-config --configdir)/$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("LDLIBRARY"))')"
-    PYTHONINC="$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')"
+    export PYTHONVERSION=$(python3 -c "import sysconfig; print(sysconfig.get_python_version())")
+    export PYTHONVERSION_MAJOR=$(python3 -c "import sys; print(sys.version_info.major)")
+    export PYTHONVERSION_MINOR=$(python3 -c "import sys; print(sys.version_info.minor)")
+
+    # 1: path to python3
+    # 2: path to python3-config
+    get_python_lib()
+    {
+        echo "$(dirname -z $(${2:-python3-config} --prefix))$(${1:-python3} -c 'import sysconfig; print(sysconfig.get_config_var("LIBDIR"))')/$(${1:-python3} -c 'import sysconfig; print(sysconfig.get_config_var("LDLIBRARY"))')"
+    }
+
+    # 1: path to python3
+    get_python_include()
+    {
+        echo "$(${1:-python3} -c 'import sysconfig; print(sysconfig.get_path("include"))')"
+    }
 
 packageTools: [python3]
 packageSetup: *ref

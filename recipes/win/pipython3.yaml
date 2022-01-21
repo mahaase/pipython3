@@ -7,7 +7,9 @@ privateEnvironment:
     BASEMENT_LIBS: "both"
 
 depends:
-    - pipython3-setuptools
+    - name: pipython3-minimal
+      use: [tools]
+      forward: true
 
 checkoutSCM:
     scm: url
@@ -38,22 +40,31 @@ buildScript: |
     cp -a install/usr/bin/*.lib install/usr/libs/
     cp src/python3-config install/usr/bin
 
-    rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
-
 multiPackage:
-    "":
+    withsetuptools:
+        depends:
+            - pipython3-setuptools
+
+        buildScript: |
+            rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
+
         packageScript: |
             installPackageTgt "$1/install/"
 
         provideTools:
             python3: usr/bin
 
-    dev:
+    "":
         depends:
+            - name: pipython3-withsetuptools
+              use: [tools]
+              forward: true
+            - pipython3-setuptools
             - pipython3-pip
             - pipython3-wheel
 
         buildScript: |
+            rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
             rsync -a "${BOB_DEP_PATHS[pipython3-pip]}/" install/
             rsync -a "${BOB_DEP_PATHS[pipython3-wheel]}/" install/
 
@@ -64,3 +75,7 @@ multiPackage:
             python3:
                 path: usr/bin
                 netAccess: True
+
+    dev:
+        packageScript: |
+            installPackageLib "$1/install/"

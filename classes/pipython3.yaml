@@ -13,7 +13,7 @@ buildSetup: |
     fi
     PYTHONPATH="${PYTHONPATH:+$PYTHONPATH}"
     for j in "" "lib-dynload" "site-packages" "dist-packages" ; do
-        PYTHONPATH+="${PYTHONPATH:+:}${PYTHONROOTDIR}$PYTHONDESTLIB${j:+/$j}"
+        PYTHONPATH="${PYTHONROOTDIR}$PYTHONDESTLIB${j:+/$j}${PYTHONPATH:+:$PYTHONPATH}"
     done
     export PYTHONPATH
     export PYTHONROOTDIR

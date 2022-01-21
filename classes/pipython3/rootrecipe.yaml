@@ -2,25 +2,13 @@ depends:
     - if: !expr |
         "${BOB_HOST_PLATFORM}" == "linux"
       depends:
-        - name: pipython3-minimal
-          use: [tools]
-          forward: True
         - name: pipython3
-          use: [tools]
-          forward: True
-        - name: pipython3-dev
           use: [tools]
           forward: True
 
     - if: !expr |
         "${BOB_HOST_PLATFORM}" == "msys"
       depends:
-        - name: win::pipython3-minimal
-          use: [tools]
-          forward: True
         - name: win::pipython3
-          use: [tools]
-          forward: True
-        - name: win::pipython3-dev
           use: [tools]
           forward: True
