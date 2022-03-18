@@ -7,7 +7,7 @@ privateEnvironment:
     BASEMENT_LIBS: "both"
 
 depends:
-    - name: pipython3-minimal
+    - name: win::pipython3-minimal
       use: [tools]
       forward: true
 
@@ -56,7 +56,7 @@ multiPackage:
 
     "":
         depends:
-            - name: pipython3-withsetuptools
+            - name: win::pipython3-withsetuptools
               use: [tools]
               forward: true
             - pipython3-setuptools
