@@ -1,4 +1,4 @@
-inherit: [patch, install, msbuild]
+inherit: [patch, msbuild]
 
 metaEnvironment:
     PKG_VERSION: "3.8.0"
@@ -49,7 +49,7 @@ multiPackage:
             rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
 
         packageScript: |
-            installPackageTgt "$1/install/"
+            rsync -a "$1/install/" .
 
         provideTools:
             python3: usr/bin
@@ -78,4 +78,4 @@ multiPackage:
 
     dev:
         packageScript: |
-            installPackageLib "$1/install/"
+            rsync -a "$1/install/" .
