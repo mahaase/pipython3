@@ -23,22 +23,42 @@ checkoutScript: |
 
 # depends on python3-minimal tool
 buildTools: [python3]
+buildVars: [BASEMENT_DEBUG]
 buildScript: |
-    mkdir -p src
-    rsync -aH --delete --exclude "*.tar.xz*" $1/ src/
+    D=$1
+    buildMe()
+    {
+        SUFFIX=""
+        EXTRA=( )
+        if [[ "${1:-}" == "dev" ]] ; then
+            if [[ "${BASEMENT_DEBUG:-0}" != "0" ]] ; then
+                SUFFIX="_d"
+                EXTRA+=( -d )
+            fi
+        fi
 
-    EXTERNALS_DIR="$(pwd -W)/externals" HOST_PYTHON="$(which python3)" ./src/PCbuild/build.bat -p x64
-    installdir="$(find src/PCbuild -iname 'python.exe')"
-    installdir="$(dirname $installdir)"
+        mkdir -p src
+        rsync -aH --delete --exclude "*.tar.xz*" $D/ src/
 
-    mkdir -p install/usr/bin install/usr/lib install/usr/libs
-    rsync -a $installdir/ install/usr/bin/
-    cp install/usr/bin/python.exe install/usr/bin/python3.exe
-    rsync -a src/Lib/ install/usr/lib/
-    rsync -a src/Include/ install/usr/include/
-    rsync -am --include "*.h" --include "*/" --exclude "*" src/PC/ install/usr/include/
-    cp -a install/usr/bin/*.lib install/usr/libs/
-    cp src/python3-config install/usr/bin
+        EXTERNALS_DIR="$(pwd -W)/externals" HOST_PYTHON="$(which python3)" ./src/PCbuild/build.bat -p x64 ${EXTRA[@]}
+        installdir="$(dirname $(find src/PCbuild -iname python${SUFFIX}.exe))"
+
+        mkdir -p install/usr/bin install/usr/lib
+        rsync -a --exclude "*.lib" $installdir/ install/usr/bin/
+        rsync -a --include "*.lib" --exclude "*" $installdir/ install/usr/lib/
+        cp install/usr/bin/python${SUFFIX}.exe install/usr/bin/python.exe &> /dev/null || true
+        cp install/usr/bin/python${SUFFIX}.exe install/usr/bin/python3.exe
+        cp install/usr/bin/python${SUFFIX}.exe install/usr/bin/python3${SUFFIX}.exe
+        rsync -a src/Lib/ install/usr/lib/
+        rsync -a src/Include/ install/usr/include/
+        rsync -am --include "*.h" --include "*/" --exclude "*" src/PC/ install/usr/include/
+        for i in $(find install/usr/lib -iname "*_d*.lib") ; do
+            basename=$(basename $i)
+            dirname=$(dirname $i)
+            cp $i $dirname/${basename//_d/}
+        done
+        cp src/python3-config install/usr/bin
+    }
 
 multiPackage:
     withsetuptools:
@@ -46,6 +66,7 @@ multiPackage:
             - pipython3-setuptools
 
         buildScript: |
+            buildMe
             rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
 
         packageScript: |
@@ -64,6 +85,7 @@ multiPackage:
             - pipython3-wheel
 
         buildScript: |
+            buildMe
             rsync -a "${BOB_DEP_PATHS[pipython3-setuptools]}/" install/
             rsync -a "${BOB_DEP_PATHS[pipython3-pip]}/" install/
             rsync -a "${BOB_DEP_PATHS[pipython3-wheel]}/" install/
@@ -77,5 +99,8 @@ multiPackage:
                 netAccess: True
 
     dev:
+        buildScript: |
+            buildMe "dev"
+
         packageScript: |
             rsync -a "$1/install/" .
