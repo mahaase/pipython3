@@ -1,0 +1,9 @@
+.git*           eol=lf export-ignore
+
+*.patch         eol=lf
+
+*.yaml          eol=lf
+
+*.md            eol=lf
+COPYING         eol=lf
+LICENSE         eol=lf
